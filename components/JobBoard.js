@@ -149,11 +149,8 @@ export default function JobBoard({ jobs, allTypes }) {
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-jungle-accent text-xl font-display">◆</span>
-            <span className="font-display text-lg text-jungle-text">AlternanceHub</span>
+            <span className="font-display text-lg text-jungle-text">Start'Ease</span>
           </div>
-          <span className="text-jungle-muted text-sm hidden sm:block">
-            {filtered.length} offre{filtered.length > 1 ? 's' : ''} disponible{filtered.length > 1 ? 's' : ''}
-          </span>
         </div>
       </header>
 
@@ -164,12 +161,10 @@ export default function JobBoard({ jobs, allTypes }) {
             Île-de-France · Mis à jour aujourd'hui
           </p>
           <h1 className="font-display text-5xl sm:text-6xl md:text-7xl text-jungle-text leading-[1.05] mb-6">
-            Trouve ton<br />
-            <span className="text-jungle-accent">alternance</span><br />
-            idéale.
+            <span className="text-jungle-accent">Start'Ease</span>
           </h1>
           <p className="text-jungle-muted text-lg leading-relaxed max-w-xl">
-            {jobs.length} offres sélectionnées chaque jour dans tous les secteurs. 
+            +23k offres mises à jour quotidiennement dans tous les secteurs.
             Postule directement sur le site de l'entreprise.
           </p>
         </div>
@@ -267,7 +262,7 @@ export default function JobBoard({ jobs, allTypes }) {
 
       {/* Footer */}
       <footer className="border-t border-jungle-border py-8 px-6 text-center text-jungle-muted text-xs">
-        <p>AlternanceHub · Offres mises à jour quotidiennement · Sources : Adzuna</p>
+        <p>Start'Ease · Offres mises à jour quotidiennement · Sources : Adzuna</p>
       </footer>
     </div>
   )
