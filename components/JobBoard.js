@@ -1,21 +1,20 @@
 'use client'
-
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 
 const TYPE_COLORS = {
-  'RH & Paie':                  'bg-purple-900/40 text-purple-300 border-purple-700/50',
-  'Informatique & Dev':         'bg-blue-900/40 text-blue-300 border-blue-700/50',
-  'Data & Digital':             'bg-cyan-900/40 text-cyan-300 border-cyan-700/50',
-  'Marketing & Com':            'bg-pink-900/40 text-pink-300 border-pink-700/50',
-  'Finance & Compta':           'bg-emerald-900/40 text-emerald-300 border-emerald-700/50',
-  'Commerce & Vente':           'bg-orange-900/40 text-orange-300 border-orange-700/50',
-  'Banque & Assurance':         'bg-amber-900/40 text-amber-300 border-amber-700/50',
-  'Logistique & Supply Chain':  'bg-teal-900/40 text-teal-300 border-teal-700/50',
-  'Ingénierie & Production':    'bg-red-900/40 text-red-300 border-red-700/50',
-  'BTP & Génie Civil':          'bg-stone-800/60 text-stone-300 border-stone-600/50',
+  'RH & Paie':                      'bg-purple-900/40 text-purple-300 border-purple-700/50',
+  'Informatique & Dev':             'bg-blue-900/40 text-blue-300 border-blue-700/50',
+  'Data & Digital':                 'bg-cyan-900/40 text-cyan-300 border-cyan-700/50',
+  'Marketing & Com':                'bg-pink-900/40 text-pink-300 border-pink-700/50',
+  'Finance & Compta':               'bg-emerald-900/40 text-emerald-300 border-emerald-700/50',
+  'Commerce & Vente':               'bg-orange-900/40 text-orange-300 border-orange-700/50',
+  'Banque & Assurance':             'bg-amber-900/40 text-amber-300 border-amber-700/50',
+  'Logistique & Supply Chain':      'bg-teal-900/40 text-teal-300 border-teal-700/50',
+  'Ingénierie & Production':        'bg-red-900/40 text-red-300 border-red-700/50',
+  'BTP & Génie Civil':              'bg-stone-800/60 text-stone-300 border-stone-600/50',
   'Maintenance & Électrotechnique': 'bg-yellow-900/40 text-yellow-300 border-yellow-700/50',
-  'Juridique & Droit':          'bg-indigo-900/40 text-indigo-300 border-indigo-700/50',
-  'Qualité':                    'bg-lime-900/40 text-lime-300 border-lime-700/50',
+  'Juridique & Droit':              'bg-indigo-900/40 text-indigo-300 border-indigo-700/50',
+  'Qualité':                        'bg-lime-900/40 text-lime-300 border-lime-700/50',
 }
 
 function getColor(type) {
@@ -41,6 +40,104 @@ function formatSalaire(min, max) {
   return null
 }
 
+// ── Dropdown multi-select component ──────────────────────────────────────────
+function MultiDropdown({ label, icon, options, selected, onChange }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    function onClick(e) {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false)
+    }
+    document.addEventListener('mousedown', onClick)
+    return () => document.removeEventListener('mousedown', onClick)
+  }, [])
+
+  function toggle(value) {
+    onChange(
+      selected.includes(value)
+        ? selected.filter(v => v !== value)
+        : [...selected, value]
+    )
+  }
+
+  function clearAll() { onChange([]) }
+
+  const count = selected.length
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm transition-colors ${
+          open || count > 0
+            ? 'border-jungle-accent text-jungle-accent bg-jungle-accent/5'
+            : 'border-jungle-border text-jungle-muted bg-jungle-card hover:border-zinc-500'
+        }`}
+      >
+        {icon}
+        <span>{label}</span>
+        {count > 0 && (
+          <span className="bg-jungle-accent text-black text-xs font-bold px-1.5 py-0.5 rounded-full leading-none">
+            {count}
+          </span>
+        )}
+        <svg
+          className={`w-3.5 h-3.5 ml-1 transition-transform ${open ? 'rotate-180' : ''}`}
+          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="absolute top-full left-0 mt-2 z-40 min-w-[220px] bg-[#1a1a1a] border border-jungle-border rounded-xl shadow-xl overflow-hidden">
+          {count > 0 && (
+            <div className="px-3 pt-2.5 pb-1.5 border-b border-jungle-border">
+              <button
+                onClick={clearAll}
+                className="text-xs text-jungle-accent hover:underline underline-offset-2"
+              >
+                Effacer la sélection ({count})
+              </button>
+            </div>
+          )}
+          <ul className="py-1.5 max-h-64 overflow-y-auto">
+            {options.map(opt => {
+              const active = selected.includes(opt)
+              return (
+                <li key={opt}>
+                  <button
+                    onClick={() => toggle(opt)}
+                    className={`w-full flex items-center gap-3 px-3 py-2 text-sm text-left transition-colors ${
+                      active
+                        ? 'text-jungle-accent bg-jungle-accent/5'
+                        : 'text-jungle-text hover:bg-white/5'
+                    }`}
+                  >
+                    {/* custom checkbox */}
+                    <span className={`w-4 h-4 shrink-0 rounded border flex items-center justify-center transition-colors ${
+                      active ? 'bg-jungle-accent border-jungle-accent' : 'border-zinc-600'
+                    }`}>
+                      {active && (
+                        <svg className="w-2.5 h-2.5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </span>
+                    {opt}
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Job card ──────────────────────────────────────────────────────────────────
 function JobCard({ job }) {
   const initials = job.entreprise
     .split(' ')
@@ -106,16 +203,24 @@ function JobCard({ job }) {
   )
 }
 
+// ── Main board ────────────────────────────────────────────────────────────────
 const ITEMS_PER_PAGE = 24
 
 export default function JobBoard({ jobs, allTypes }) {
-  const [search, setSearch] = useState('')
-  const [activeType, setActiveType] = useState('')
-  const [page, setPage] = useState(1)
+  const [search, setSearch]           = useState('')
+  const [activeTypes, setActiveTypes] = useState([])   // multi
+  const [activeRegions, setActiveRegions] = useState([]) // multi
+  const [page, setPage]               = useState(1)
+
+  const allRegions = useMemo(
+    () => [...new Set(jobs.map(j => j.region).filter(Boolean))].sort(),
+    [jobs]
+  )
 
   const filtered = useMemo(() => {
     let res = jobs
-    if (activeType) res = res.filter(j => j.type === activeType)
+    if (activeTypes.length)   res = res.filter(j => activeTypes.includes(j.type))
+    if (activeRegions.length) res = res.filter(j => activeRegions.includes(j.region))
     if (search.trim()) {
       const q = search.toLowerCase()
       res = res.filter(j =>
@@ -126,13 +231,17 @@ export default function JobBoard({ jobs, allTypes }) {
       )
     }
     return res
-  }, [jobs, activeType, search])
+  }, [jobs, activeTypes, activeRegions, search])
 
   const paginated = filtered.slice(0, page * ITEMS_PER_PAGE)
-  const hasMore = paginated.length < filtered.length
+  const hasMore   = paginated.length < filtered.length
 
-  function handleTypeClick(t) {
-    setActiveType(prev => prev === t ? '' : t)
+  const hasActiveFilters = activeTypes.length > 0 || activeRegions.length > 0 || search.trim()
+
+  function resetAll() {
+    setSearch('')
+    setActiveTypes([])
+    setActiveRegions([])
     setPage(1)
   }
 
@@ -151,6 +260,9 @@ export default function JobBoard({ jobs, allTypes }) {
             <span className="text-jungle-accent text-xl font-display">◆</span>
             <span className="font-display text-lg text-jungle-text">Start'Ease</span>
           </div>
+          <span className="text-jungle-muted text-sm hidden sm:block">
+            {filtered.length} offre{filtered.length > 1 ? 's' : ''} disponible{filtered.length > 1 ? 's' : ''}
+          </span>
         </div>
       </header>
 
@@ -158,7 +270,7 @@ export default function JobBoard({ jobs, allTypes }) {
       <section className="max-w-7xl mx-auto px-6 pt-20 pb-14">
         <div className="max-w-3xl">
           <p className="text-jungle-accent text-sm font-medium tracking-widest uppercase mb-4">
-            Île-de-France · Mis à jour aujourd'hui
+            France · Mis à jour aujourd'hui
           </p>
           <h1 className="font-display text-5xl sm:text-6xl md:text-7xl text-jungle-text leading-[1.05] mb-6">
             <span className="text-jungle-accent">Start'Ease</span>
@@ -186,8 +298,9 @@ export default function JobBoard({ jobs, allTypes }) {
 
       {/* Search + Filters */}
       <section className="max-w-7xl mx-auto px-6 mb-10">
+
         {/* Search bar */}
-        <div className="relative mb-6">
+        <div className="relative mb-4">
           <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-jungle-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
@@ -208,23 +321,65 @@ export default function JobBoard({ jobs, allTypes }) {
           )}
         </div>
 
-        {/* Type filters */}
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => handleTypeClick('')}
-            className={`tag ${activeType === '' ? 'active' : ''}`}
-          >
-            Tous
-          </button>
-          {allTypes.map(t => (
+        {/* Dropdowns row */}
+        <div className="flex flex-wrap items-center gap-3">
+
+          {/* Secteur dropdown */}
+          <MultiDropdown
+            label="Secteur"
+            icon={
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            }
+            options={allTypes}
+            selected={activeTypes}
+            onChange={(v) => { setActiveTypes(v); setPage(1) }}
+          />
+
+          {/* Région dropdown */}
+          <MultiDropdown
+            label="Région"
+            icon={
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            }
+            options={allRegions}
+            selected={activeRegions}
+            onChange={(v) => { setActiveRegions(v); setPage(1) }}
+          />
+
+          {/* Reset button — only visible when filters are active */}
+          {hasActiveFilters && (
             <button
-              key={t}
-              onClick={() => handleTypeClick(t)}
-              className={`tag ${activeType === t ? 'active' : ''}`}
+              onClick={resetAll}
+              className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-sm text-jungle-muted hover:text-jungle-text border border-transparent hover:border-jungle-border transition-colors"
             >
-              {t}
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Réinitialiser
             </button>
-          ))}
+          )}
+
+          {/* Active filter chips */}
+          <div className="flex flex-wrap gap-2 ml-1">
+            {activeTypes.map(t => (
+              <span key={t} className="flex items-center gap-1.5 text-xs px-3 py-1 rounded-full border border-jungle-accent/40 text-jungle-accent bg-jungle-accent/5">
+                {t}
+                <button onClick={() => { setActiveTypes(prev => prev.filter(v => v !== t)); setPage(1) }} className="hover:text-white">✕</button>
+              </span>
+            ))}
+            {activeRegions.map(r => (
+              <span key={r} className="flex items-center gap-1.5 text-xs px-3 py-1 rounded-full border border-jungle-accent/40 text-jungle-accent bg-jungle-accent/5">
+                {r}
+                <button onClick={() => { setActiveRegions(prev => prev.filter(v => v !== r)); setPage(1) }} className="hover:text-white">✕</button>
+              </span>
+            ))}
+          </div>
+
         </div>
       </section>
 
@@ -234,7 +389,7 @@ export default function JobBoard({ jobs, allTypes }) {
           <div className="text-center py-24 text-jungle-muted">
             <p className="text-5xl mb-4">◇</p>
             <p className="text-lg">Aucune offre trouvée pour cette recherche.</p>
-            <button onClick={() => { setSearch(''); setActiveType(''); setPage(1) }} className="mt-4 text-jungle-accent text-sm underline underline-offset-4">
+            <button onClick={resetAll} className="mt-4 text-jungle-accent text-sm underline underline-offset-4">
               Réinitialiser les filtres
             </button>
           </div>
