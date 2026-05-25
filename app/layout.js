@@ -13,8 +13,8 @@ const dmSans = DM_Sans({
 })
 
 export const metadata = {
-  title: 'AlternanceHub — Les meilleures offres d\'alternance',
-  description: 'Découvrez chaque jour les meilleures offres d\'alternance en Île-de-France sélectionnées pour vous.',
+  title: "Start'Ease — Les meilleures offres d'alternance",
+  description: "Découvrez chaque jour les meilleures offres d'alternance sélectionnées pour vous.",
 }
 
 export default function RootLayout({ children }) {
